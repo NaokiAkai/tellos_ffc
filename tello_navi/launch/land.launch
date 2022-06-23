@@ -1,0 +1,10 @@
+<!-- land.launch -->
+<launch >
+    <arg name="node_name" default="land" />
+
+    <arg name="land_name" default="/tello/land" />
+
+    <node name="$(arg node_name)" pkg="tello_navi" type="land" output="log" >
+        <param name="land_name" value="$(arg land_name)" type="string" />
+    </node >
+</launch >

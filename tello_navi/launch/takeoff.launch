@@ -1,0 +1,10 @@
+<!-- takeoff.launch -->
+<launch >
+    <arg name="node_name" default="takeoff" />
+
+    <arg name="takeoff_name" default="/tello/takeoff" />
+
+    <node name="$(arg node_name)" pkg="tello_navi" type="takeoff" output="log" >
+        <param name="takeoff_name" value="$(arg takeoff_name)" type="string" />
+    </node >
+</launch >

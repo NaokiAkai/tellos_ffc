@@ -1,0 +1,4 @@
+<!-- system.launch -->
+<launch >
+    <include file="$(find vrpn_client_ros)/launch/tellos_mocap.launch" />
+</launch >

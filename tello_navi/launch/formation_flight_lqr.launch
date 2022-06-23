@@ -1,0 +1,26 @@
+<!-- formation_flight_lqr.launch -->
+<launch >
+    <arg name="tello_num" default="6" />
+    
+    <arg name="cotrol_hz" default="30.0" />
+
+    <arg name="q_ind" default="0.5" />
+    <arg name="q_cp" default="0.1" />
+
+    <arg name="max_linear_vel" default="1.0" />
+    <arg name="max_angular_vel" default="1.0" />
+
+
+
+    <node name="formation_flight_lqr" pkg="tello_navi" type="formation_flight_lqr" output="screen" >
+        <param name="tello_num" value="$(arg tello_num)" type="int" />
+
+        <param name="cotrol_hz" value="$(arg cotrol_hz)" type="double" />
+
+        <param name="q_ind" value="$(arg q_ind)" type="double" />
+        <param name="q_cp" value="$(arg q_cp)" type="double" />
+
+        <param name="max_linear_vel" value="$(arg max_linear_vel)" type="double" />
+        <param name="max_angular_vel" value="$(arg max_angular_vel)" type="double" />
+    </node >
+</launch >

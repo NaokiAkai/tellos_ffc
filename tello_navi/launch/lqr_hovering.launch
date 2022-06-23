@@ -1,0 +1,36 @@
+<!-- lqr_hovering.launch -->
+<launch >
+    <arg name="node_name" default="lqr_hovering" />
+
+    <arg name="pose_name" default="/tello/pose" />
+    <arg name="target_name" default="/tello/target" />
+    <arg name="cmd_name" default="/tello/cmd_vel" />
+
+    <arg name="target_x" default="1.0" />
+    <arg name="target_y" default="1.0" />
+    <arg name="target_z" default="1.0" />
+    <arg name="target_yaw" default="1.0" />
+
+    <arg name="control_hz" default="30.0" />
+
+    <arg name="max_linear_vel" default="0.5" />
+    <arg name="max_angular_vel" default="0.5" />
+
+
+
+    <node name="$(arg node_name)" pkg="tello_navi" type="lqr_hovering" output="log" >
+        <param name="pose_name" value="$(arg pose_name)" type="string" />
+        <param name="target_name" value="$(arg target_name)" type="string" />
+        <param name="cmd_name" value="$(arg cmd_name)" type="string" />
+
+        <param name="target_x" value="$(arg target_x)" type="double" />
+        <param name="target_y" value="$(arg target_y)" type="double" />
+        <param name="target_z" value="$(arg target_z)" type="double" />
+        <param name="target_yaw" value="$(arg target_yaw)" type="double" />
+
+        <param name="control_hz" value="$(arg control_hz)" type="double" />
+
+        <param name="max_linear_vel" value="$(arg max_linear_vel)" type="double" />
+        <param name="max_angular_vel" value="$(arg max_angular_vel)" type="double" />
+    </node >
+</launch >

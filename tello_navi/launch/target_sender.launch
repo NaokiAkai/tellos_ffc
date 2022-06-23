@@ -1,0 +1,11 @@
+<!-- target_sender.launch -->
+<launch >
+    <arg name="node_name" default="target_sender" />
+
+    <arg name="send_hz" default="10.0" />
+
+
+    <node name="$(arg node_name)" pkg="tello_navi" type="target_sender" output="log" >
+        <param name="send_hz" value="$(arg send_hz)" type="double" />
+    </node >
+</launch >

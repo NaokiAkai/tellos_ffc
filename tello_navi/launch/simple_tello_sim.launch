@@ -1,0 +1,41 @@
+<!-- simple_tello_sim.launch -->
+<launch >
+    <arg name="node_name" default="simple_tello_sim" />
+
+    <arg name="map_frame" default="map" />
+    <arg name="base_frame" default="base_link" />
+
+    <arg name="takeoff_name" default="/tello/takeoff" />
+    <arg name="land_name" default="/tello/land" />
+    <arg name="cmd_name" default="/tello/cmd_vel" />
+    <arg name="pose_name" default="/tello/pose" />
+
+    <arg name="initial_x" default="0.0" />
+    <arg name="initial_y" default="0.0" />
+    <arg name="initial_z" default="0.0" />
+    <arg name="initial_yaw" default="0.0" />
+
+    <arg name="sim_hz" default="10.0" />
+
+
+
+    <node name="$(arg node_name)" pkg="tello_navi" type="simple_tello_sim" output="log" >
+        <param name="node_name" value="$(arg node_name)" type="string" />
+
+        <param name="map_frame" value="$(arg map_frame)" type="string" />
+        <param name="base_frame" value="$(arg base_frame)" type="string" />
+
+        <param name="takeoff_name" value="$(arg takeoff_name)" type="string" />
+        <param name="land_name" value="$(arg land_name)" type="string" />
+        <param name="cmd_name" value="$(arg cmd_name)" type="string" />
+        <param name="pose_name" value="$(arg pose_name)" type="string" />
+
+        <param name="initial_x" value="$(arg initial_x)" type="double" />
+        <param name="initial_y" value="$(arg initial_y)" type="double" />
+        <param name="initial_z" value="$(arg initial_z)" type="double" />
+        <param name="initial_yaw" value="$(arg initial_yaw)" type="double" />
+
+        <param name="sim_hz" value="$(arg sim_hz)" type="double" />
+    </node >
+
+</launch >
