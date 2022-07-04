@@ -1,3 +1,22 @@
+/****************************************************************************
+ * Formation flight controller with Tello EDU
+ * Copyright (C) 2022 Naoki Akai
+ *
+ * Licensed under the Apache License, Version 2.0 (the “License”);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an “AS IS” BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author Naoki Akai
+ ****************************************************************************/
+
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
 #include <visualization_msgs/MarkerArray.h>
@@ -7,24 +26,20 @@ private:
     ros::NodeHandle nh_;
     ros::Publisher markersPub_;
     int telloNum_;
-    std::string mapFrame_, markersName_;
-    tf::TransformListener tfListener_;
+    std::string markersName_;
     double propellerSize_, propellerScale_, shaftLength_, shaftScale_;
 
 public:
     TFMarkers(void):
         nh_("~"),
-        telloNum_(3),
-        mapFrame_("map"),
+        telloNum_(6),
         markersName_("/tellos_marker"),
         propellerSize_(0.3),
         propellerScale_(0.05),
         shaftLength_(0.6),
-        shaftScale_(0.05),
-        tfListener_()
+        shaftScale_(0.05)
     {
         nh_.param("tello_num", telloNum_, telloNum_);
-        nh_.param("map_frame", mapFrame_, mapFrame_);
         nh_.param("markers_name", markersName_, markersName_);
         nh_.param("propeller_size", propellerSize_, propellerSize_);
         nh_.param("propeller_scale", propellerScale_, propellerScale_);
@@ -40,23 +55,9 @@ public:
             visualization_msgs::MarkerArray markers;
             int markerID = 0;
             for (int i = 0; i < telloNum_; ++i) {
-                tf::StampedTransform transform;
-                try {
-                    std::string baseFrame = "base_link" + std::to_string(i);
-                    tfListener_.lookupTransform(mapFrame_, baseFrame, ros::Time(0), transform);
-                } catch (tf::TransformException ex) {
-                    ROS_ERROR("%s", ex.what());
-                    loopRate.sleep();
-                    continue;
-                }
-                double poseX = transform.getOrigin().x();
-                double poseY = transform.getOrigin().y();
-                double poseZ = transform.getOrigin().z();
-                double roll, pitch, yaw;
-                tf::Matrix3x3(transform.getRotation()).getRPY(roll, pitch, yaw);
-
                 visualization_msgs::Marker propeller;
-                propeller.header.frame_id = mapFrame_;
+                std::string baseFrame = "base_link" + std::to_string(i);
+                propeller.header.frame_id = baseFrame;
                 propeller.header.stamp = ros::Time::now();
                 propeller.ns = "tello_propellers";
                 propeller.lifetime = ros::Duration();
@@ -76,15 +77,15 @@ public:
                 propeller.pose.orientation.w = 1.0;
                 for (int i = 0; i < 4; ++i) {
                     propeller.id = markerID;
-                    propeller.pose.position.x = poseX + 0.3 * cos(i * M_PI / 2.0 + M_PI / 4.0 + yaw);
-                    propeller.pose.position.y = poseY + 0.3 * sin(i * M_PI / 2.0 + M_PI / 4.0 + yaw);
-                    propeller.pose.position.z = poseZ;
+                    propeller.pose.position.x = shaftLength_ / 2.0 * cos(i * M_PI / 2.0 + M_PI / 4.0);
+                    propeller.pose.position.y = shaftLength_ / 2.0 * sin(i * M_PI / 2.0 + M_PI / 4.0);
+                    propeller.pose.position.z = 0.0;
                     markers.markers.push_back(propeller);
                     markerID++;
                 }
 
                 visualization_msgs::Marker shafts;
-                shafts.header.frame_id = mapFrame_;
+                shafts.header.frame_id = baseFrame;
                 shafts.header.stamp = ros::Time::now();
                 shafts.ns = "tello_shafts";
                 shafts.lifetime = ros::Duration();
@@ -105,15 +106,15 @@ public:
                 shafts.id = markerID;
                 for (int i = 0; i < 2; ++i) {
                     geometry_msgs::Point p1, p2;
-                    p1.x = poseX + shaftLength_ / 2.0 * cos(i * M_PI / 2.0 + M_PI / 4.0 + yaw);
-                    p1.y = poseY + shaftLength_ / 2.0 * sin(i * M_PI / 2.0 + M_PI / 4.0 + yaw);
-                    p2.x = poseX + shaftLength_ / 2.0 * cos(i * M_PI / 2.0 + M_PI / 4.0 + M_PI + yaw);
-                    p2.y = poseY + shaftLength_ / 2.0 * sin(i * M_PI / 2.0 + M_PI / 4.0 + M_PI + yaw);
-                    p1.z = p2.z = poseZ;
+                    p1.x = shaftLength_ / 2.0 * cos(i * M_PI / 2.0 + M_PI / 4.0);
+                    p1.y = shaftLength_ / 2.0 * sin(i * M_PI / 2.0 + M_PI / 4.0);
+                    p2.x = shaftLength_ / 2.0 * cos(i * M_PI / 2.0 + M_PI / 4.0 + M_PI);
+                    p2.y = shaftLength_ / 2.0 * sin(i * M_PI / 2.0 + M_PI / 4.0 + M_PI);
+                    p1.z = p2.z = 0.0;
                     shafts.points.push_back(p1);
                     shafts.points.push_back(p2);
                 }
-                markerID;
+                markerID++;
 
                 markers.markers.push_back(shafts);
             }

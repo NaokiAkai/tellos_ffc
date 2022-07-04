@@ -1,3 +1,22 @@
+/****************************************************************************
+ * Formation flight controller with Tello EDU
+ * Copyright (C) 2022 Naoki Akai
+ *
+ * Licensed under the Apache License, Version 2.0 (the “License”);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an “AS IS” BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author Naoki Akai
+ ****************************************************************************/
+
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
 #include <std_msgs/Empty.h>
@@ -10,7 +29,7 @@ private:
     ros::Subscriber joySub_;
     geometry_msgs::Twist cmd_;
     int telloNum_, targetTelloNum_;
-    FormationFlightUtility utility_;
+    FormationFlightUtility *utility_;
     double linearVelCoef_, angularVelCoef_;
 
 public:
@@ -27,7 +46,7 @@ public:
 
         joySub_ = nh_.subscribe("/joy", 1, &JoyOpeNode::joyCB, this);
 
-        utility_ = FormationFlightUtility(nh_, telloNum_);
+        utility_ = new FormationFlightUtility(nh_, telloNum_);
 
         cmd_.linear.x = cmd_.linear.y = cmd_.linear.z = cmd_.angular.z = 0.0;
     }
@@ -36,7 +55,7 @@ public:
         ros::Rate loopRate(10.0);
         while (ros::ok()) {
             ros::spinOnce();
-            utility_.publishCmd(cmd_, targetTelloNum_);
+            utility_->publishCmd(cmd_, targetTelloNum_);
             ROS_INFO("id: = %d, vx = %lf, vy = %lf, vz = %lf, wz = %lf",
                 targetTelloNum_, cmd_.linear.x, cmd_.linear.y, cmd_.linear.z, cmd_.angular.z);
             loopRate.sleep();
@@ -45,10 +64,10 @@ public:
 
     void joyCB(const sensor_msgs::Joy::ConstPtr &msg) {
         if (msg->buttons[2] == 1) {
-            utility_.takeoffAll();
+            utility_->takeoffAll();
             ROS_INFO("takeoff");
         } else if (msg->buttons[0] == 1) {
-            utility_.landAll();
+            utility_->landAll();
             ROS_INFO("land");
         } else if (msg->buttons[5] == 1) {
             targetTelloNum_++;

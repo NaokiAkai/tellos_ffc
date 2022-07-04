@@ -16,7 +16,8 @@
     <arg name="initial_yaw" default="0.0" />
 
     <arg name="sim_hz" default="10.0" />
-
+    <arg name="system_gain" default="3.0" />
+    <arg name="time_constant" default="0.2" />
 
 
     <node name="$(arg node_name)" pkg="tello_navi" type="simple_tello_sim" output="log" >
@@ -36,6 +37,8 @@
         <param name="initial_yaw" value="$(arg initial_yaw)" type="double" />
 
         <param name="sim_hz" value="$(arg sim_hz)" type="double" />
+        <param name="system_gain" value="$(arg system_gain)" type="double" />
+        <param name="time_constant" value="$(arg time_constant)" type="double" />
     </node >
 
 </launch >

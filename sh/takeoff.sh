@@ -1,7 +1,7 @@
 #! /bin/bash
 
 source ./params
-source ../devel/setup.bash
+source ../../../devel/setup.bash
 
 for ((i = 0; i < $tello_num; i++))
 do

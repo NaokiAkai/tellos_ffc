@@ -1,0 +1,14 @@
+<!-- joy_ope_node.launch -->
+<launch >
+    <arg name="tello_num" default="6" />
+
+    <arg name="linear_vel_coef" default="1.0" />
+    <arg name="angular_vel_coef" default="1.0" />
+
+    <node name="joy_ope_node" pkg="tello_navi" type="joy_ope_node" output="screen" >
+        <param name="tello_num" value="$(arg tello_num)" type="int" />
+
+        <param name="linear_vel_coef" value="$(arg linear_vel_coef)" type="string" />
+        <param name="angular_vel_coef" value="$(arg angular_vel_coef)" type="string" />
+    </node >
+</launch >

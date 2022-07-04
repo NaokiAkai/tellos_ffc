@@ -1,4 +1,4 @@
-<!-- formation_flight_lqr.launch -->
+<!-- formation_flight.launch -->
 <launch >
     <arg name="tello_num" default="6" />
     
@@ -12,7 +12,7 @@
 
 
 
-    <node name="formation_flight_lqr" pkg="tello_navi" type="formation_flight_lqr" output="screen" >
+    <node name="formation_flight" pkg="tello_navi" type="formation_flight" output="screen" >
         <param name="tello_num" value="$(arg tello_num)" type="int" />
 
         <param name="cotrol_hz" value="$(arg cotrol_hz)" type="double" />

@@ -1,14 +1,14 @@
 <!-- tf_markers.launch -->
 <launch >
-    <arg name="tello_num" default="3" />
+    <arg name="tello_num" default="6" />
 
     <arg name="map_frame" default="map" />
     <arg name="markers_name" default="/tellos_marker" />
 
-    <arg name="propeller_size" default="0.3" />
-    <arg name="propeller_scale" default="0.05" />
-    <arg name="shaft_length" default="0.6" />
-    <arg name="shaft_scale" default="0.05" />
+    <arg name="propeller_size" default="0.1" />
+    <arg name="propeller_scale" default="0.02" />
+    <arg name="shaft_length" default="0.2" />
+    <arg name="shaft_scale" default="0.02" />
 
 
     <node name="tf_markers" pkg="tello_navi" type="tf_markers" output="log" >

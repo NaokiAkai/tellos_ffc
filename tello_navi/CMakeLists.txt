@@ -37,17 +37,15 @@ target_link_libraries(land ${catkin_LIBRARIES})
 add_executable(simple_tello_sim src/simple_tello_sim.cpp)
 target_link_libraries(simple_tello_sim ${catkin_LIBRARIES})
 
-add_executable(lqr_hovering src/lqr_hovering.cpp)
-target_link_libraries(lqr_hovering ${catkin_LIBRARIES})
-
 add_executable(target_sender src/target_sender.cpp)
 target_link_libraries(target_sender ${catkin_LIBRARIES})
 
 add_executable(tf_markers src/tf_markers.cpp)
 target_link_libraries(tf_markers ${catkin_LIBRARIES})
 
-add_executable(formation_flight_lqr src/formation_flight_lqr.cpp src/formation_flight_utility.cpp)
-target_link_libraries(formation_flight_lqr ${catkin_LIBRARIES})
+add_executable(formation_flight src/formation_flight.cpp src/formation_flight_utility.cpp)
+target_link_libraries(formation_flight ${catkin_LIBRARIES})
 
 add_executable(pose_dumper src/pose_dumper.cpp src/formation_flight_utility.cpp)
 target_link_libraries(pose_dumper ${catkin_LIBRARIES})
+

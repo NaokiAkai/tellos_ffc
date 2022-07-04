@@ -1,3 +1,22 @@
+/****************************************************************************
+ * Formation flight controller with Tello EDU
+ * Copyright (C) 2022 Naoki Akai
+ *
+ * Licensed under the Apache License, Version 2.0 (the “License”);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an “AS IS” BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * @author Naoki Akai
+ ****************************************************************************/
+
 #include <ros/ros.h>
 #include <std_msgs/Empty.h>
 #include <geometry_msgs/Twist.h>
@@ -14,8 +33,8 @@ private:
     std::string mapFrame_, baseFrame_, takeoffName_, landName_, cmdName_, poseName_;
     geometry_msgs::Twist cmd_;
     double lastCmdTime_;
-    double poseX_, poseY_, poseZ_, poseYaw_, groundZ_;
-    double simHz_;
+    double poseX_, poseY_, poseZ_, poseYaw_, vx_, vy_, vz_, wz_, groundZ_;
+    double simHz_, systemGain_, timeConstant_;
     bool canUpdateCmd_;
     tf::TransformBroadcaster tfBroadcaster_;
 
@@ -32,7 +51,13 @@ public:
         poseY_(0.0),
         poseZ_(0.0),
         poseYaw_(0.0),
-        simHz_(10.0),
+        vx_(0.0),
+        vy_(0.0),
+        vz_(0.0),
+        wz_(0.0),
+        simHz_(20.0),
+        systemGain_(3.0),
+        timeConstant_(0.2),
         lastCmdTime_(-1.0),
         tfBroadcaster_(),
         canUpdateCmd_(false)
@@ -48,6 +73,8 @@ public:
         nh_.param("initial_z", poseZ_, poseZ_);
         nh_.param("initial_yaw", poseYaw_, poseYaw_);
         nh_.param("sim_hz", simHz_, simHz_);
+        nh_.param("system_gain", systemGain_, systemGain_);
+        nh_.param("time_constant", timeConstant_, timeConstant_);
 
         groundZ_ = poseZ_;
 
@@ -68,6 +95,7 @@ public:
         canUpdateCmd_ = false;
         poseZ_ = groundZ_;
         cmd_.linear.x = cmd_.linear.y = cmd_.linear.z = cmd_.angular.z = 0.0;
+        vx_ = vy_ = vz_ = wz_ = 0.0;
         ROS_INFO("land");
     }
 
@@ -79,24 +107,39 @@ public:
     }
 
     void updatePose(void) {
-        double dt = 1.0 / simHz_;
+        static bool isFirst = true;
+        static double prevTime;
+        double currTime = ros::Time::now().toSec();
+        if (isFirst) {
+            prevTime = currTime;
+            isFirst = false;
+            return;
+        }
+
+        double dt = currTime - prevTime;
+        double a = -timeConstant_ / (timeConstant_ + dt);
+        double b = systemGain_ * dt / (timeConstant_ + dt);
+
         // *************************************************************************************
         // this velocity conversion is implemented due to specification of the tello_driver_node
-        double vx = cmd_.linear.y;
-        double vy = -cmd_.linear.x;
+        vx_ = a * vx_ + b * cmd_.linear.y;
+        vy_ = a * vy_ + b * (-cmd_.linear.x);
+        vz_ = a * vz_ + b * cmd_.linear.z;
+        wz_ = a * wz_ + b * (-cmd_.angular.z);
         // *************************************************************************************
-//         poseX_ += cmd_.linear.y * dt;
-//         poseY_ += -cmd_.linear.x * dt;
+
         double c = cos(poseYaw_);
         double s = sin(poseYaw_);
-        poseX_ += (vx * c - vy * s) * dt;
-        poseY_ += (vx * s + vy * c) * dt;
-        poseZ_ += cmd_.linear.z * dt;
-        poseYaw_ += cmd_.angular.z * dt;
+        poseX_ += (vx_ * c - vy_ * s) * dt;
+        poseY_ += (vx_ * s + vy_ * c) * dt;
+        poseZ_ += vz_ * dt;
+        poseYaw_ += wz_ * dt;
         while (poseYaw_ < -M_PI)
             poseYaw_ += 2.0 * M_PI;
         while (poseYaw_ > M_PI)
             poseYaw_ -= 2.0 * M_PI;
+
+        prevTime = currTime;
     }
 
     void broadcastTF(void) {
